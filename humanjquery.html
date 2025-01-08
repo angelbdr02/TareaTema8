@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Human Benchmark JS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #e6e6e6;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #contenedor {
+            text-align: center;
+            background: linear-gradient(45deg, #ff6b6b, #f7a8b8);
+            padding: 40px;
+            border-radius: 20px;
+            width: 350px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            color: white;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        #pantalla {
+            width: 100%;
+            height: 120px;
+            background: #e1e1e1;
+            margin-top: 20px;
+            border-radius: 10px;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #pantalla.verde {
+            background: linear-gradient(45deg, #58D68D, #27AE60);
+            color: #fff;
+        }
+
+        #pantalla:active {
+            transform: scale(0.98);
+        }
+
+        #resultado {
+            display: none;
+            font-size: 20px;
+            margin-top: 20px;
+            font-weight: 600;
+        }
+
+        #estado {
+            font-size: 18px;
+            margin-top: 15px;
+        }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div id="contenedor">
+        <h1>Test de Reacción</h1>
+        <div id="estado">
+            <p>Haz clic para comenzar</p>
+        </div>
+        <div id="pantalla">Haz clic cuando veas el color de fondo</div>
+        <div id="resultado">
+            <p>Tu tiempo de reacción: <span id="tiempo"></span> ms</p>
+        </div>
+    </div>
+
+    <script>
+        let estado = 1; // 1: Inicial, 2: Esperando, 3: Pantalla Roja, 4: Final
+        let tiempoInicio;
+        let tiempoFinal;
+
+        $(document).ready(function() {
+            $("#pantalla").click(function() {
+                iniciarJuego();
+            });
+        });
+
+        function iniciarJuego() {
+            if (estado === 1) {
+                // Estado 1: Esperando al clic
+                $("#estado").html("<p>Esperando...</p>");
+                $("#pantalla").css('pointer-events', 'none'); // Deshabilitar el clic en el botón
+
+                // Estado 2: Esperar un tiempo aleatorio
+                setTimeout(mostrarPantallaVerde, Math.random() * 3000 + 1000); // Aleatorio entre 1 y 4 segundos
+
+                estado = 2;
+            } else if (estado === 3) {
+                // Estado 3: Pantalla con el color de fondo cambiado
+                tiempoFinal = Date.now();
+                const tiempoReaccion = tiempoFinal - tiempoInicio;
+                $("#tiempo").text(tiempoReaccion);
+                $("#resultado").show();
+                $("#estado").html("<p>¡Buen trabajo! El juego se reiniciará...</p>");
+
+                // Se reinicia el juego después de mostrar el resultado
+                setTimeout(resetearJuego, 1500); // Espera 1.5 segundos antes de reiniciar
+                estado = 4;
+            } else {
+                // Estado 2: Si se hizo clic antes de que la pantalla se pusiera verde
+                // Simplemente reiniciamos el juego
+                resetearJuego();
+            }
+        }
+
+        function mostrarPantallaVerde() {
+            // Estado 3: Cambiar a pantalla verde 
+            $("#pantalla").addClass("verde");
+            $("#pantalla").text("¡Ahora!");
+            tiempoInicio = Date.now();
+            $("#estado").html("<p>¡Ahora!</p>");
+            $("#pantalla").css('pointer-events', 'auto'); // Habilitar el clic
+            estado = 3;
+        }
+
+        function resetearJuego() {
+            // Resetear los valores y el estado del juego
+            $("#pantalla").removeClass("verde");
+            $("#pantalla").text("Haz clic cuando veas el color de fondo");
+            $("#resultado").hide();
+            $("#estado").html("<p>Haz clic para comenzar...</p>");
+            estado = 1;
+            $("#pantalla").css('pointer-events', 'auto'); // Habilitar el clic
+        }
+    </script>
+</body>
+</html>

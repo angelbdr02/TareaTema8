@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Elementos JS</title>
+    <style>
+       
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f0f4f8;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        h2, h3 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        
+        #formulario {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+            transition: box-shadow 0.3s ease;
+        }
+
+        #formulario:hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        input[type="color"] {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+       
+        button {
+            background: #7c3aed; 
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            margin: 12px;
+            transition: background 0.3s ease;
+            width: 200px;
+        }
+
+        button:hover {
+            background: #6b2fa7; 
+        }
+
+      
+        .contenedor-elementos {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            padding: 0 20px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .elemento {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            width: 220px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .elemento:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .elemento img {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+       
+        #formulario button#reset {
+            background: #7c3aed;
+        }
+
+        #formulario button#reset:hover {
+            background: #6b2fa7; 
+        }
+
+    </style>
+</head>
+<body>
+    <div id="formulario">
+        <h2>Formulario</h2>
+        <label for="color">Selecciona un color de fondo:</label>
+        <input type="color" id="color" value="#ffffff">
+        <button id="cambiar-fondo">Cambiar color de fondo</button>
+        <button id="añadir-elemento">Añadir más elementos</button>
+    </div>
+
+    <h3>Elementos</h3>
+    <div class="contenedor-elementos" id="contenedor-elementos">
+       
+    </div>
+
+    <script>
+        // Lista de imágenes
+        const imagenes = [
+            './imagenes/manzana.webp', 
+            './imagenes/pera.webp'
+        ];
+    
+        const contenedorElementos = document.getElementById('contenedor-elementos');
+        const selectorDeColor = document.getElementById('color');
+        const btnCambiarFondo = document.getElementById('cambiar-fondo');
+        const btnAñadirElemento = document.getElementById('añadir-elemento');
+    
+        let colorActual = '#ffffff';
+    
+        // Función para crear un nuevo elemento
+        const crearElemento = () => {
+            const elemento = document.createElement('div');
+            elemento.classList.add('elemento');
+            elemento.style.backgroundColor = colorActual; // Asigna el color actual al nuevo elemento
+    
+            const imagen = document.createElement('img');
+            const imagenAleatoria = imagenes[Math.floor(Math.random() * imagenes.length)];
+            imagen.src = imagenAleatoria;
+            elemento.appendChild(imagen);
+    
+            const botonCambiarImagen = document.createElement('button');
+            botonCambiarImagen.textContent = 'Cambiar imagen';
+            botonCambiarImagen.addEventListener('click', () => {
+                const nombreImagenActual = imagen.src.split('/').pop();
+                const indiceActual = imagenes.findIndex(imagen => imagen.includes(nombreImagenActual));
+                const siguienteIndice = (indiceActual + 1) % imagenes.length;
+                imagen.src = imagenes[siguienteIndice];
+            });
+
+            elemento.appendChild(botonCambiarImagen);
+    
+            const btnBorrar = document.createElement('button');
+            btnBorrar.textContent = 'Borrar';
+            btnBorrar.addEventListener('click', () => {
+                contenedorElementos.removeChild(elemento);
+            });
+            elemento.appendChild(btnBorrar);
+    
+            contenedorElementos.appendChild(elemento);
+        };
+    
+        // Cambiar el color de fondo solo de los elementos
+        btnCambiarFondo.addEventListener('click', () => {
+            colorActual = selectorDeColor.value;
+            const elementos = document.querySelectorAll('.elemento');
+            elementos.forEach(elemento => {
+                elemento.style.backgroundColor = colorActual;  // Solo cambia el fondo del elemento
+            });
+        });
+    
+        // Añadir un nuevo elemento
+        btnAñadirElemento.addEventListener('click', crearElemento);
+    
+        // Inicializar los elementos
+        const inicializarElementos = () => {
+            contenedorElementos.innerHTML = ''; // Limpiar elementos existentes
+            for (let i = 0; i < 4; i++) {
+                crearElemento();
+            }
+        };
+    
+        // Botón para resetear la página
+        const btnResetear = document.createElement('button');
+        btnResetear.textContent = 'Resetear';
+        btnResetear.id = 'reset';
+        btnResetear.addEventListener('click', () => {
+            colorActual = '#ffffff'; // Resetear color
+            selectorDeColor.value = colorActual;
+            inicializarElementos();
+        });
+        document.getElementById('formulario').appendChild(btnResetear);
+    
+        // Inicializar los elementos al cargar la página
+        inicializarElementos();
+    </script>
+</body>
+</html>
